@@ -1,0 +1,110 @@
+# .github/workflows/deploy.yml
+
+name: Build and Deploy Angular with Flutter Module to Firebase
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch. Adjust as needed.
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the Angular repository
+      - name: Checkout Angular Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Dart SDK
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 'stable'  # Installs the latest stable Dart SDK
+
+      # Step 3: Install FVM (Flutter Version Manager)
+      - name: Install FVM
+        run: |
+          dart pub global activate fvm
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH  # Adds FVM to the PATH
+
+      # Step 4: Clone the Flutter Module Repository
+      - name: Clone Flutter Module Repository
+        run: |
+          git clone https://github.com/devnaseem/mbc_wellness.git
+
+      # Step 5a: Cache Flutter Pub Packages (Optional for Speed)
+      - name: Cache Flutter Pub Packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            mbc_wellness/.fvm
+          key: ${{ runner.os }}-fvm-${{ hashFiles('mbc_wellness/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-fvm-
+
+      # Step 5: Install Flutter via FVM
+      - name: Install Flutter with FVM
+        run: |
+          cd mbc_wellness
+          fvm install  # Installs the Flutter version specified in the Flutter module's configuration
+
+      # Step 6: Run Flutter Dependencies (pub get)
+      - name: Flutter Pub Get
+        run: |
+          cd mbc_wellness
+          fvm flutter pub get  # Installs Flutter dependencies
+
+      # Step 7: Build Flutter Web App
+      - name: Build Flutter Web
+        run: |
+          cd mbc_wellness
+          fvm flutter build web --release -t lib/main_web_entry.dart --web-renderer html --cs
+          # -t: Specifies the entrypoint file
+          # --web-renderer html: Uses the HTML renderer for smaller build size
+          # --cs: Enables code splitting for better performance
+
+      # Step 8: Integrate Flutter Build into Angular Assets
+      - name: Copy Flutter Build to Angular Assets
+        run: |
+          mkdir -p src/assets/flutter  # Creates the flutter assets directory if it doesn't exist
+          rm -rf src/assets/flutter/*  # Clears any existing files in the flutter assets directory
+          cp -r mbc_wellness/build/web/* src/assets/flutter/  # Copies Flutter build output
+
+      # Step 9: Setup Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Specify the Node.js version compatible with your Angular project
+
+      # Step 10a: Cache Node.js Modules (Optional for Speed)
+      - name: Cache Node.js Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Step 10: Install Angular Dependencies
+      - name: Install Angular Dependencies
+        run: npm install  # Installs Angular project dependencies as defined in package.json
+
+      # Step 11: Build Angular Application
+      - name: Build Angular App
+        run: npx ng build --configuration production
+        # Alternatively, use 'npm run build' if defined in package.json scripts
+
+      # Step 12: Install Firebase CLI
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      # Step 13: Deploy to Firebase Hosting
+      - name: Deploy to Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}  # Accesses the Firebase token from GitHub Secrets
+        run: firebase deploy --only hosting --token $FIREBASE_TOKEN
+        # '--only hosting' ensures only the hosting service is deployed. Adjust if deploying other services.
