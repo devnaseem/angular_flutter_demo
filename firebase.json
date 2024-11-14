@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/nas-angular-app",
+    "public": "dist/angular_flutter_demo",
     "ignore": [
       "firebase.json",
       "**/.*",
