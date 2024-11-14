@@ -5,7 +5,7 @@ name: Build and Deploy Angular with Flutter Module to Firebase
 on:
   push:
     branches:
-      - main  # Trigger the workflow on pushes to the main branch. Adjust as needed.
+      - master  # Trigger the workflow on pushes to the main branch. Adjust as needed.
 
 jobs:
   build-and-deploy:
