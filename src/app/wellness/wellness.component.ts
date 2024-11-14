@@ -10,8 +10,7 @@ declare var _flutter: any;
   styles: [`
     :host div {
       width: 100%;
-      height: 600px;
-      position: relative;
+      height: 100vh;      position: relative;
     }
     .spinner {
       position: absolute;
