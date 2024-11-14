@@ -76,7 +76,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '21'  # Specify the Node.js version compatible with your Angular project
+          node-version: '20'  # Specify the Node.js version compatible with your Angular project
 
       # Step 10a: Cache Node.js Modules (Optional for Speed)
       - name: Cache Node.js Modules
