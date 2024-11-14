@@ -60,7 +60,7 @@ jobs:
       - name: Build Flutter Web
         run: |
           cd mbc_wellness
-          fvm flutter build web --release -t lib/main_web_entry.dart --web-renderer html --cs
+          fvm flutter build web --release -t lib/main_web_entry.dart --web-renderer html
           # -t: Specifies the entrypoint file
           # --web-renderer html: Uses the HTML renderer for smaller build size
           # --cs: Enables code splitting for better performance
