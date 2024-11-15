@@ -1,8 +1,15 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { WellnessComponent } from './wellness/wellness.component'; // Adjust the path as necessary
+import { HomeComponent } from './home/home.component';
+import { WellnessComponent } from './wellness/wellness.component';
+import { GalleryComponent } from './gallery/gallery.component';
+import { ContactUsComponent } from './contact-us/contact-us.component';
 
 export const routes: Routes = [
+  { path: 'home', component: HomeComponent },
   { path: 'wellness', component: WellnessComponent },
-  // You can add more routes here if needed
+  { path: 'gallery', component: GalleryComponent },
+  { path: 'contact', component: ContactUsComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '**', redirectTo: '/home' },
 ];

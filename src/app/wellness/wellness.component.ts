@@ -1,4 +1,6 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+
 
 // Declare the global _flutter namespace
 declare var _flutter: any;
@@ -21,6 +23,8 @@ declare var _flutter: any;
   `],
 })
 export class WellnessComponent implements AfterViewInit {
+
+
   @ViewChild('flutterTarget', { static: true }) flutterTarget!: ElementRef;
 
   @Output() appLoaded: EventEmitter<Object> = new EventEmitter<Object>();
@@ -36,12 +40,19 @@ export class WellnessComponent implements AfterViewInit {
     env: 'dev',
   };
 
+  private backPressedListener = this.handleBackPressed.bind(this);
+
+  constructor(private router: Router) {}
+
   ngAfterViewInit(): void {
     const target: HTMLElement = this.flutterTarget.nativeElement;
-    console.log('Initializing Flutter app in target:', target);
+    console.log('Initializing Flutter app in target:-', target);
 
     // Define the initial data in a global JS variable
     window.flutterInitialData = JSON.stringify(this.initialData);
+
+      // Listen for "back_pressed" event
+      window.addEventListener('back_pressed', this.backPressedListener);
 
     // Dynamically load flutter.js if not already loaded
     if (typeof _flutter === 'undefined') {
@@ -56,6 +67,12 @@ export class WellnessComponent implements AfterViewInit {
       console.log('flutter.js already loaded.');
       this.initializeFlutterApp(target);
     }
+  }
+
+  handleBackPressed(event: Event) {
+    console.log('Received back_pressed event from Flutter');
+    // Navigate back to Home
+    this.router.navigate(['/home']);
   }
 
   private initializeFlutterApp(target: HTMLElement) {

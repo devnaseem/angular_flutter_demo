@@ -1,58 +1,28 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Router, NavigationEnd, RouterModule } from '@angular/router'; // Import RouterModule and NavigationEnd
+import { Component } from '@angular/core';
 import { HeaderComponent } from './header/header.component';
-import { UserComponent } from './user/user.component';
-import { DUMMY_USERS } from './dummy-users';
-import { TasksComponent } from './tasks/tasks.component';
-import { Subscription } from 'rxjs';
-
-import { WellnessComponent } from './wellness/wellness.component';
-
+import { RouterOutlet, Router, NavigationEnd, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HeaderComponent, UserComponent, TasksComponent, RouterOutlet],
+  imports: [HeaderComponent, RouterOutlet, CommonModule, RouterModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  onAddFeature() {
-    //throw new Error('Method not implemented.');
-  }
+  title = 'nas-angular-app';
 
-  showLayout: boolean = true; // Flag to determine whether to show header and main
-
-  private routerSubscription!: Subscription;
-
-  constructor(private router: Router) {}
-
-  ngOnInit(): void {
-    this.routerSubscription = this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        // Check if the current URL starts with '/wellness'
-        this.showLayout = !event.urlAfterRedirects.startsWith('/wellness');
-      }
+  constructor(private router: Router) {
+    // Subscribe to router events
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      console.log('Navigation End:', event.urlAfterRedirects);
     });
   }
 
-  ngOnDestroy(): void {
-    this.routerSubscription.unsubscribe();
+  logClick(route: string) {
+    console.log(`Link clicked: ${route}`);
   }
-
-  onAddTask() {
-    this.router.navigate(['/wellness']);
-  }
-
-  selectedUserId?: String;
-
-  get selectedUser() {
-    return this.users.find((user) => user.id === this.selectedUserId);
-  }
-
-  onSelectUser(id: string) {
-    this.selectedUserId = id;
-  }
-  title = 'nas-angular-app';
-  users = DUMMY_USERS;
 }

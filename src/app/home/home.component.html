@@ -1,0 +1,13 @@
+<!-- src/app/home/home.component.html -->
+<ul id="users">
+    <li *ngFor="let user of users; trackBy: trackByUserId">
+      <app-user [user]="user" (select)="onSelectUser($event)" [selected]="user.id === selectedUserId"></app-user>
+    </li>
+  </ul>
+  <!-- <ng-container *ngIf="selectedUser; else fallback">
+    <app-tasks [userId]="selectedUser.id" [userName]="selectedUser.name"></app-tasks>
+  </ng-container>
+  <ng-template #fallback>
+    <p id="fallback">Please select a user to see the details.</p>
+  </ng-template> -->
+  
