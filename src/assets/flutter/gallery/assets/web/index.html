@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your Flutter Web App</title>
+    <base href="/">
+    <meta name="description" content="A Flutter web app.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="flutter.js" defer></script>
+</head>
+<body>
+<script>
+    window.addEventListener('load', function(ev) {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('flutter_service_worker.js');
+      }
+    });
+</script>
+</body>
+</html>

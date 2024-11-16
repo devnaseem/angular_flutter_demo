@@ -1,4 +1,6 @@
 <!-- src/app/home/home.component.html -->
+<h2>Home</h2>
+<p>Users</p>
 <ul id="users">
     <li *ngFor="let user of users; trackBy: trackByUserId">
       <app-user [user]="user" (select)="onSelectUser($event)" [selected]="user.id === selectedUserId"></app-user>

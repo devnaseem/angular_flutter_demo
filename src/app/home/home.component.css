@@ -2,11 +2,22 @@
 
 #users {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    width: 50%;
+    margin: 0.5rem;
+    padding: 0.2rem;
     display: flex;
-    gap: 0.5rem;
+    gap: 0.9rem;
     overflow: auto;
+  }
+  p {
+    margin: 0.5rem;
+    padding: 0.2rem;
+  }
+
+  h2 {
+    color: #0C4762;
+    margin: 0.5rem;
+    padding: 0.2rem;
   }
   
   #fallback {

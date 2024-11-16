@@ -11,92 +11,110 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [16.x]
+        flutter-version: [3.10.5] # Specify the Flutter version you need
+
     steps:
       # Step 1: Checkout the Angular repository
       - name: Checkout Angular Repository
         uses: actions/checkout@v3
 
-      # Step 2: Setup Dart SDK
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: 'stable'  # Installs the latest stable Dart SDK
-
-      # Step 3: Install FVM (Flutter Version Manager)
-      - name: Install FVM
-        run: |
-          dart pub global activate fvm
-          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH  # Adds FVM to the PATH
-
-      # Step 4: Clone the Flutter Module Repository
-      - name: Clone Flutter Module Repository
-        run: |
-          git clone https://github.com/devnaseem/mbc_wellness.git
-
-      # Step 5a: Cache Flutter Pub Packages (Optional for Speed)
-      - name: Cache Flutter Pub Packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            mbc_wellness/.fvm
-          key: ${{ runner.os }}-fvm-${{ hashFiles('mbc_wellness/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-fvm-
-
-      # Step 5: Install Flutter via FVM
-      - name: Install Flutter with FVM
-        run: |
-          cd mbc_wellness
-          fvm install  # Installs the Flutter version specified in the Flutter module's configuration
-
-      # Step 6: Run Flutter Dependencies (pub get)
-      - name: Flutter Pub Get
-        run: |
-          cd mbc_wellness
-          fvm flutter pub get  # Installs Flutter dependencies
-
-      # Step 7: Build Flutter Web App
-      - name: Build Flutter Web
-        run: |
-          cd mbc_wellness
-          fvm flutter build web --release -t lib/main_web_entry.dart --web-renderer html
-          # -t: Specifies the entrypoint file
-          # --web-renderer html: Uses the HTML renderer for smaller build size
-          # --cs: Enables code splitting for better performance
-
-      # Step 8: Integrate Flutter Build into Angular Assets
-      - name: Copy Flutter Build to Angular Assets
-        run: |
-          mkdir -p src/assets/flutter  # Creates the flutter assets directory if it doesn't exist
-          rm -rf src/assets/flutter/*  # Clears any existing files in the flutter assets directory
-          cp -r mbc_wellness/build/web/* src/assets/flutter/  # Copies Flutter build output
-
-      # Step 9: Setup Node.js
-      - name: Set up Node.js
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Specify the Node.js version compatible with your Angular project
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-      # Step 10a: Cache Node.js Modules (Optional for Speed)
-      - name: Cache Node.js Modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      # Step 10: Install Angular Dependencies
+      # Step 3: Install Angular Dependencies
       - name: Install Angular Dependencies
-        run: npm install  # Installs Angular project dependencies as defined in package.json
+        run: npm install  # Installs Angular project dependencies as defined in package.json            
 
-      # Step 11: Build Angular Application
+      # Step 3: Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+
+      # Step 4: Clone Wellness Flutter Module
+      - name: Clone Wellness Flutter Module
+        uses: actions/checkout@v3
+        with:
+          repository: devnaseem/mbc_wellness.git
+          path: mbc_wellness
+
+      # Step 5:  Build Wellness Flutter Web
+      - name: Build Wellness Flutter Web
+        run: |
+          cd mbc_wellness
+          flutter pub get
+          flutter build web --release -t lib/main_web_entry.dart --web-renderer html
+          cd ..   
+          
+      # Step 6: Clone Gallery Flutter Module
+      - name: Clone Gallery Flutter Module
+        uses: actions/checkout@v3
+        with:
+          repository: devnaseem/mbc_gallery.git
+          path: mbc_gallery
+
+      # Step 7: Build Gallery Flutter Module
+      - name: Build Gallery Flutter Web
+        run: |
+          cd mbc_gallery
+          flutter pub get
+          flutter build web --release -t lib/main_web_entry.dart --web-renderer html
+          cd ..          
+
+      # Step 7: Prepare Angular Assets Directory
+      - name: Prepare Angular Assets Directory
+        run: |
+          mkdir -p src/assets/flutter/wellness
+          mkdir -p src/assets/flutter/gallery
+          
+      # Step 8: Copy Wellness Flutter Assets
+      - name: Copy Wellness Flutter Assets
+        run: |
+          cp -r mbc_wellness/build/web/* src/assets/flutter/wellness/
+          # Exclude flutter.js if already handled          
+
+      # Step 9: Copy Gallery Flutter Assets
+      - name: Copy Gallery Flutter Assets
+        run: |
+          cp -r mbc_gallery/build/web/* src/assets/flutter/gallery/
+          # Exclude flutter.js to prevent duplication          
+
+      - name: Copy Shared flutter.js
+        run: |
+          echo "Copying shared flutter.js..."
+          if [ -f mbc_wellness/build/web/flutter.js ]; then
+            cp mbc_wellness/build/web/flutter.js src/assets/flutter/
+            echo "Copied flutter.js from wellness module."
+          else
+            echo "flutter.js not found in wellness module."
+            exit 1
+          fi
+
+          # Remove flutter.js from gallery module to avoid duplication
+          if [ -f mbc_gallery/build/web/flutter.js ]; then
+            rm mbc_gallery/build/web/flutter.js
+            echo "Removed flutter.js from gallery module."
+          else
+            echo "No flutter.js in gallery_flutter."
+          fi
+
+
+      # Step 11: Clean Up Cloned Repositories (Optional)
+      - name: Clean Up Cloned Repositories
+        run: |
+          rm -rf wellness_flutter
+          rm -rf gallery_flutter
+
+      # Step 12: Build Angular Application
       - name: Build Angular App
         run: npx ng build --configuration production
-        # Alternatively, use 'npm run build' if defined in package.json scripts
 
       # Step 12: Install Firebase CLI
       - name: Install Firebase CLI
