@@ -40,7 +40,7 @@ jobs:
       - name: Clone Wellness Flutter Module
         uses: actions/checkout@v3
         with:
-          repository: devnaseem/mbc_wellness.git
+          repository: devnaseem/mbc_wellness
           path: mbc_wellness
 
       # Step 5:  Build Wellness Flutter Web
@@ -55,7 +55,7 @@ jobs:
       - name: Clone Gallery Flutter Module
         uses: actions/checkout@v3
         with:
-          repository: devnaseem/mbc_gallery.git
+          repository: devnaseem/mbc_gallery
           path: mbc_gallery
 
       # Step 7: Build Gallery Flutter Module
