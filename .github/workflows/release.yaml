@@ -11,8 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
-        flutter-version: [3.10.5] # Specify the Flutter version you need
+        node-version: [20.x]
+        flutter-version: [3.24.0] # Specify the Flutter version you need
 
     steps:
       # Step 1: Checkout the Angular repository
