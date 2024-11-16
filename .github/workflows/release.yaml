@@ -1,5 +1,3 @@
-# .github/workflows/deploy.yml
-
 name: Build and Deploy Angular with Flutter Module to Firebase
 
 on:
