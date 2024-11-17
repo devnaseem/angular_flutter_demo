@@ -2,6 +2,9 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.2.
 
+Adds multiple flutter modules to the angular application.
+
+[Link to the angular application](https://angular-flutter-demo.web.app/)
 
 ### npm install
 
