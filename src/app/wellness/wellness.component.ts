@@ -2,6 +2,7 @@
 import { Component, HostListener, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { FlutterInitService } from '../flutter-init.service';
+import { FlutterDataService } from '../flutter-data-service';
 
 @Component({
   selector: 'app-wellness',
@@ -23,10 +24,20 @@ export class WellnessComponent implements AfterViewInit, OnDestroy {
   constructor(
     private router: Router,
     private flutterInit: FlutterInitService,
+    private flutterDataService: FlutterDataService,
     private ngZone: NgZone
   ) {}
 
   ngAfterViewInit(): void {
+
+  // Set data for Flutter
+  this.flutterDataService.setFlutterInitialData({
+    accessToken: 'user_access_token',
+    identityToken: 'user_identity_token',
+    systemId: 'user_system_id',
+    env: 'dev', // Example: pass 'dev', 'staging', or 'prod'
+  });
+
     // Initialize Flutter via the service
     this.flutterInit.loadFlutterModule(
       'flutter-app-wellness', // Unique host element ID

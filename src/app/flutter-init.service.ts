@@ -97,6 +97,7 @@ export class FlutterInitService {
         const appRunner = await engineInitializer.initializeEngine({
           hostElement: target,
           assetBase: assetBase,
+          
         });
         console.log('Engine initialized. Running app...');
         await appRunner.runApp();
