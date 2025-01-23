@@ -1,24 +1,13 @@
-// src/app/wellness/wellness.component.ts
-import { Component, HostListener, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, AfterViewInit, OnDestroy, NgZone, HostListener } from '@angular/core';
 import { FlutterInitService } from '../flutter-init.service';
 import { FlutterDataService } from '../flutter-data-service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-wellness',
   standalone: true,
   templateUrl: './wellness.component.html',
-  styles: [`
-    /* Your styles here */
-    .spinner {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.5rem;
-      color: #0C4762;
-    }
-  `],
 })
 export class WellnessComponent implements AfterViewInit, OnDestroy {
   constructor(
@@ -29,21 +18,37 @@ export class WellnessComponent implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit(): void {
+    this.flutterDataService.setFlutterData({
+      accessToken: 'initial_access_token',
+      identityToken: 'initial_identity_token',
+      systemId: 'initial_system_id',
+      env: 'dev',
+    });
 
-  // Set data for Flutter
-  this.flutterDataService.setFlutterInitialData({
-    accessToken: 'user_access_token',
-    identityToken: 'user_identity_token',
-    systemId: 'user_system_id',
-    env: 'dev', // Example: pass 'dev', 'staging', or 'prod'
-  });
-
-    // Initialize Flutter via the service
     this.flutterInit.loadFlutterModule(
-      'flutter-app-wellness', // Unique host element ID
-      'assets/flutter/wellness/', // Asset base path for wellness
-      'assets/flutter/wellness/main.dart.js' // Entrypoint URL for wellness
+      'flutter-app-wellness',
+      'assets/flutter/wellness/',
+      'assets/flutter/wellness/main.dart.js'
     );
+
+    // Example: Simulate dynamic data change
+    // setTimeout(() => {
+    //   this.flutterDataService.setFlutterData({ accessToken: 'updated_token' });
+    // }, 5000);
+  }
+
+  // Function to update Flutter data with some random values
+  updateFlutterData(): void {
+    // Generate random data (for demonstration)
+    const updatedData = {
+      accessToken: `updated_token_${Math.floor(Math.random() * 1000)}`,
+      identityToken: `updated_identity_${Math.floor(Math.random() * 1000)}`,
+      systemId: `updated_system_${Math.floor(Math.random() * 1000)}`,
+      env: 'prod'
+    };
+
+    // Call the service to update the data
+    this.flutterDataService.setFlutterData(updatedData);
   }
 
   @HostListener('window:back_pressed', ['$event'])
