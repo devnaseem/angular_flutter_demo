@@ -5479,7 +5479,11 @@ path_provider_linux
 path_provider_platform_interface
 path_provider_windows
 plugin_platform_interface
+url_launcher
+url_launcher_android
+url_launcher_ios
 url_launcher_linux
+url_launcher_macos
 url_launcher_platform_interface
 url_launcher_windows
 vector_graphics
@@ -6613,7 +6617,7 @@ equatable
 
 MIT License
 
-Copyright (c) 2024 Felix Angelov
+Copyright (c) 2018 Felix Angelov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
